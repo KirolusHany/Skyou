@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KikoStore.Infrastructure.Migrations
 {
-    [DbContext(typeof(StoredContent))]
+    [DbContext(typeof(StoreContext))]
     [Migration("20241111150412_IntialCreate")]
     partial class IntialCreate
     {

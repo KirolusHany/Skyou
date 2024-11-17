@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KikoStore.Infrastructure.Migrations
 {
-    [DbContext(typeof(StoredContent))]
-    partial class StoredContentModelSnapshot : ModelSnapshot
+    [DbContext(typeof(StoreContext))]
+    partial class StoreContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

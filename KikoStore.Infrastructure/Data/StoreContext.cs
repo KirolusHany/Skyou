@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KikoStore.Infrastructure.Data;
 
-public class StoredContent(DbContextOptions options) : DbContext(options)
+public class StoreContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<Product> Products { get; private set; }
 
