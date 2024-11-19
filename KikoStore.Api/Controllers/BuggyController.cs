@@ -24,7 +24,8 @@ public class BuggyController : BaseApiController
         throw new Exception("Internal test error");
     }
     [HttpPost("validationerror")]
-    public IActionResult GetValidationError(CreateProductDto productDto){
+    public IActionResult GetValidationError([FromBody]CreateProductDto product)
+    {
         return Ok();
     }
 }
