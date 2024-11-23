@@ -1,3 +1,4 @@
+using Company.ClassLibrary1;
 using KikoStore.Api.Middleware;
 using KikoStore.Core.Interfaces;
 using KikoStore.Infrastructure.Data;
@@ -36,24 +37,16 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
     return ConnectionMultiplexer.Connect(configuration);
 });
 builder.Services.AddSingleton<ICartServices,CartServices>();
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<AppUser>().AddEntityFrameworkStores<StoreContext>();
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-        options.RoutePrefix = string.Empty; // Optional: Makes Swagger UI available at the root URL
-    });
-}
-app.UseHttpsRedirection();
-app.UseAuthorization();
+
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod()
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
 .WithOrigins("http://localhost:4200","https://localhost:4200"));
 app.MapControllers();
-
+app.MapGroup("api").MapIdentityApi<AppUser>();
 
 
 try
