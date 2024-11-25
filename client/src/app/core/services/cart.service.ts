@@ -1,9 +1,9 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Cart, CartItem } from '../../shared/models/cart';
 import { Product } from '../../shared/models/product';
-import { map } from 'rxjs';
+import { firstValueFrom, map, tap } from 'rxjs';
+import { environment } from '../../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
@@ -36,10 +36,12 @@ getCart(id:string){
   )
 }
 
-setCart(cart:Cart){
-  return this.httpClient.post<Cart>(this.baseUrl + 'cart', cart).subscribe({
-    next:cart => this.cart.set(cart)  
-  })
+setCart(cart: Cart) {
+  return this.httpClient.post<Cart>(this.baseUrl + 'cart', cart).pipe(
+    tap(cart => {
+      this.cart.set(cart)
+    })
+  )
 }
 
 addItemToCart(item:CartItem|Product,quantity=1){
@@ -51,23 +53,24 @@ addItemToCart(item:CartItem|Product,quantity=1){
   this.setCart(cart);
 }
 
-removeItemFromCart(productId : number, quantity=1){
+async removeItemFromCart(productId: number, quantity = 1) {
   const cart = this.cart();
-  if(!cart) return;
-  const index =  cart.items.findIndex(x=>x.productId === productId);
-  if(index!==-1){
-    if(cart.items[index].quantity>quantity){
-      cart.items[index].quantity-=quantity;
-    }else{
-      cart.items.slice(index, 1); 
+  if (!cart) return;
+  const index = cart.items.findIndex(x => x.productId === productId);
+  if (index !== -1) {
+    if (cart.items[index].quantity > quantity) {
+      cart.items[index].quantity -= quantity;
+    } else {
+      cart.items.splice(index, 1);
     }
-    if(cart.items.length===0){
-      this .deleteCart();
-    }else{
-      this.setCart(cart);
+    if (cart.items.length === 0) {
+      this.deleteCart();
+    } else {
+      await firstValueFrom(this.setCart(cart));
     }
   }
 }
+
   deleteCart() {
     this.httpClient.delete(this.baseUrl + 'cart?id='+this.cart()?.id).subscribe({
       next:()=>{

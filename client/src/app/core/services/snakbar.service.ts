@@ -8,10 +8,17 @@ export class SnakbarService {
 
 private snackbar = inject(MatSnackBar);
 
-  error(message: string){
-    this.snackbar.open(message, 'Close',{
-      duration:5000,
-      panelClass:['snack-error']
-    });
-  }
+error(message: string) {
+  this.snackbar.open(message, 'Close', {
+    duration: 5000,
+    panelClass: ['snack-error']
+  })
+}
+
+success(message: string) {
+  this.snackbar.open(message, 'Close', {
+    duration: 5000,
+    panelClass: ['snack-success']
+  })
+}
 }
