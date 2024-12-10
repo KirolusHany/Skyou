@@ -1,8 +1,9 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Address, User } from '../../shared/models/user';
-import { environment } from '../../../environments/environment.development';
-import { map, pipe } from 'rxjs';
+import { map, pipe, tap } from 'rxjs';
+import { SignalrService } from './signalr.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,35 +11,45 @@ import { map, pipe } from 'rxjs';
 export class AccountService {
 baseUrl=environment.apiUrl;
 private httpclient = inject(HttpClient);
+  private signalrService = inject(SignalrService);
 currentUser = signal<User|null>(null);
 
-login(values: any){
-  let params =new HttpParams();
-  params =  params.append('useCookies',true);
-  return this.httpclient.post<User>(this.baseUrl+'login', values, {params});
+login(values: any) {
+  let params = new HttpParams();
+  params = params.append('useCookies', true);
+  return this.httpclient.post<User>(this.baseUrl + 'login', values, {params}).pipe(
+    tap(() => this.signalrService.createHubConnection())
+  )
 }
 
-register(values:any){
-  return this.httpclient.post(this.baseUrl+'account/register', values);
-
+register(values: any) {
+  return this.httpclient.post(this.baseUrl + 'account/register', values);
 }
 
-getUserInfo(){
-  return this.httpclient.get<User>(this.baseUrl+'account/user-info',{}).pipe(
-    map(user=>{
+getUserInfo() {
+  return this.httpclient.get<User>(this.baseUrl + 'account/user-info').pipe(
+    map(user => {
       this.currentUser.set(user);
       return user;
     })
   )
-  
 }
-logout(){
-  return this.httpclient.post(this.baseUrl+ 'account/logout',{});
+
+logout() {
+  return this.httpclient.post(this.baseUrl + 'account/logout', {}).pipe(
+    tap(() => this.signalrService.stopHubConnection())
+  )
 }
 
 updateAddress(address: Address) {
-return this.httpclient.post(this.baseUrl+'account/address',address);
-
+  return this.httpclient.post(this.baseUrl + 'account/address', address).pipe(
+    tap(() => {
+      this.currentUser.update(user => {
+        if (user) user.address = address;
+        return user;
+      })
+    })
+  )
 }
 
 getAuthState() {

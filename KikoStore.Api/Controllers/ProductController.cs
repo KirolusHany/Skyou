@@ -1,3 +1,4 @@
+using Company.ClassLibrary1;
 using KikoStore.Core.Entities;
 using KikoStore.Core.Interfaces;
 using KikoStore.Core.Specification;
@@ -6,32 +7,32 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KikoStore.Api.Controllers
 {
-    public class ProductController(IGenericRepository<Product> _repository) : BaseApiController
+    public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
     {
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<Product>>> GetProductsAsync
         ([FromQuery] ProductSpecificationsParams specParams)
         {
             var spec = new ProductSpecification(specParams);
-            return await CreatePagedSize(_repository,spec,specParams.PageIndex,specParams.PageSize);
+            return await CreatePagedSize(unitOfWork.Repository<Product>(),spec,specParams.PageIndex,specParams.PageSize);
         }
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetBrandsAsync()
         {
             var spec = new BrandListSpecification();
-            return Ok(await _repository.ListAsync(spec));
+            return Ok(await unitOfWork.Repository<Product>().ListAsync(spec));
         }
         [HttpGet("Types")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetTypesAsync()
         {
             var spec = new TypeListSpecfication();
-            return Ok(await _repository.ListAsync(spec));
+            return Ok(await unitOfWork.Repository<Product>().ListAsync(spec));
         }
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Product>> GetProductsAsync(int id)
         {
-            var product = await _repository.GetByIdAsync(id);
+            var product = await unitOfWork.Repository<Product>().GetByIdAsync(id);
             if (product == null) return NotFound("Product not found");
 
             return product;
@@ -41,8 +42,8 @@ namespace KikoStore.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
-            _repository.Add(product);
-            if (await _repository.SaveChangesAsync())
+            unitOfWork.Repository<Product>().Add(product);
+            if (await unitOfWork.Complete())
             {
                 return CreatedAtAction("GetProduct", new { id = product.Id }, product);
             }
@@ -50,14 +51,14 @@ namespace KikoStore.Api.Controllers
         }
         public bool ProductExists(int id)
         {
-            return _repository.IsExsits(id);
+            return unitOfWork.Repository<Product>().IsExsits(id);
         }
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateProduct(int id, Product product)
         {
             if (product.Id != id || !ProductExists(id)) return BadRequest("can not updaet product");
-            _repository.Update(product);
-            if (await _repository.SaveChangesAsync())
+            unitOfWork.Repository<Product>().Update(product);
+            if (await unitOfWork.Complete())
             {
                 return NoContent();
             }
@@ -68,10 +69,10 @@ namespace KikoStore.Api.Controllers
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteProduct(int id)
         {
-            var productFromDb = await _repository.GetByIdAsync(id);
+            var productFromDb = await unitOfWork.Repository<Product>().GetByIdAsync(id);
             if (productFromDb == null) return NotFound("can not Deleted product");
-            _repository.Delete(productFromDb);
-            if (await _repository.SaveChangesAsync())
+            unitOfWork.Repository<Product>().Delete(productFromDb);
+            if (await unitOfWork.Complete())
             {
                 return NoContent();
             }

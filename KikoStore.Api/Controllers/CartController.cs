@@ -6,27 +6,32 @@ using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace KikoStore.Api.Controllers;
 
-public class CardController(ICartServices cartServices) :BaseApiController
+ public class CartController(ICartServices cartService) : BaseApiController
 {
     [HttpGet]
-    public async Task<IActionResult> GetCard(string cardId){
-        var card =await cartServices.GetCartAsync(cardId);
-        return Ok(card?? new ShoppingCart{Id = cardId});
+    public async Task<ActionResult<ShoppingCart>> GetCartById(string id)
+    {
+        var cart = await cartService.GetCartAsync(id);
+
+        return Ok(cart ?? new ShoppingCart{Id = id});
     }
 
-
     [HttpPost]
-    public async Task<ActionResult<ShoppingCart>> UpdateCard(ShoppingCart cart){
-        var updateCard = await cartServices.SetCartAsync(cart);
-        if (updateCard==null)  return BadRequest();
-        return updateCard;
+    public async Task<ActionResult<ShoppingCart>> UpdateCart(ShoppingCart cart)
+    {
+        var updatedCart = await cartService.SetCartAsync(cart);
 
+        if (updatedCart == null) return BadRequest("Problem with cart");
+
+        return updatedCart;
     }
 
     [HttpDelete]
-    public async Task<ActionResult> DeleteCart(string id){
-        var result = await cartServices.DeleteCartAsync(id);
-        if(!result) return BadRequest("Problem happened when deleting the cart");
+    public async Task<ActionResult> DeleteCart(string id)
+    {
+        var result = await cartService.DeleteCartAsync(id);
+
+        if (!result) return BadRequest("Problem deleting cart");
 
         return Ok();
     }
