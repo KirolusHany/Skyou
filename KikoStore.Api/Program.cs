@@ -56,7 +56,10 @@ app.UseStaticFiles();
 
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<AppUser>(); // api/login
-app.MapHub<NotificationHub>("/hub/notifications");  
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<NotificationHub>("/hub/notifications");
+}); 
 app.MapFallbackToController("Index", "Fallback");
 
 try
