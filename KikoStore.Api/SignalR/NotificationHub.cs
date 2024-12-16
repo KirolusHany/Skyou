@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Company.ClassLibrary1;
+
 [Authorize]
 public class NotificationHub : Hub
 {
@@ -34,4 +35,4 @@ public class NotificationHub : Hub
 
         return connectionId;
     }
-}
+}   

@@ -31,7 +31,7 @@ public class PaymentsController(IPaymentService paymentService,
     [HttpGet("delivery-methods")]
     public async Task<ActionResult<IReadOnlyList<DeliveryMethod>>> GetDeliveryMethods()
     {
-        return Ok(await unit.Repository<DeliveryMethod>().GetAllAsync());
+        return Ok(await unit.Repository<DeliveryMethod>().ListAllAsync());
     }
 
     [HttpPost("webhook")]
@@ -76,7 +76,7 @@ public class PaymentsController(IPaymentService paymentService,
             var orderTotalInCents = (long)Math.Round(order.GetTotal() * 100, 
                 MidpointRounding.AwayFromZero);
 
-            if (orderTotalInCents != intent.Amount)
+            if ((long)order.GetTotal()*100 !=intent.Amount)
             {
                 order.Status = OrderStatus.PaymentMismatch;
             } 
@@ -86,16 +86,13 @@ public class PaymentsController(IPaymentService paymentService,
             }
 
             await unit.Complete();
-
             var connectionId = NotificationHub.GetConnectionIdByEmail(order.BuyerEmail);
-
-            if (!string.IsNullOrEmpty(connectionId))
-            {
+            if(!string.IsNullOrEmpty(connectionId)){
                 await hubContext.Clients.Client(connectionId)
-                    .SendAsync("OrderCompleteNotification", order.ToDto());
+                .SendAsync("OrderCompleteNotification",order.ToDto());
             }
         }
-    }
+    } 
 
     private Event ConstructStripeEvent(string json)
     {

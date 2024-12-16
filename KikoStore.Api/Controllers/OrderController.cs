@@ -10,8 +10,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KikoStore.Api.Controllers;
+
 [Authorize]
-public class OrdersController(ICartServices cartService, IUnitOfWork unit) : BaseApiController
+public class OrdersController(ICartService cartService, IUnitOfWork unit) : BaseApiController
 {
     [HttpPost]
     public async Task<ActionResult<Order>> CreateOrder(CreateOrderDto orderDto)
@@ -24,6 +25,7 @@ public class OrdersController(ICartServices cartService, IUnitOfWork unit) : Bas
 
         if (cart.PaymentIntentId == null) return BadRequest("No payment intent for this order");
 
+ 
         var items = new List<OrderItem>();
 
         foreach (var item in cart.Items)
@@ -58,7 +60,7 @@ public class OrdersController(ICartServices cartService, IUnitOfWork unit) : Bas
             DeliveryMethod = deliveryMethod,
             ShippingAddress = orderDto.ShippingAddress,
             Subtotal = items.Sum(x => x.Price * x.Quantity),
-            Discount = orderDto.Discount,
+            // Discount = orderDto.Discount,
             PaymentSummary = orderDto.PaymentSummary,
             PaymentIntentId = cart.PaymentIntentId,
             BuyerEmail = email
@@ -79,9 +81,9 @@ public class OrdersController(ICartServices cartService, IUnitOfWork unit) : Bas
     {
         var spec = new OrderSpecification(User.GetEmail());
 
-        var orders = await unit.Repository<Order>().GetAsync(spec);
+        var orders = await unit.Repository<Order>().ListAsync(spec);
 
-        var ordersToReturn = orders.Select(o => o.ToDto()).ToList();
+       var ordersToReturn = orders.Select(o => o.ToDto()).ToList();
 
         return Ok(ordersToReturn);
     }

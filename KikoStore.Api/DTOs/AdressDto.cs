@@ -3,10 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace KikoStore.Api.DTOs;
 
-public class AdressDto
-{
-    
 
+public class AddressDto
+{
     [Required]
     public string Line1 { get; set; } = string.Empty;
 

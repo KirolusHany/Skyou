@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 import { Order } from '../../shared/models/order';
 import { environment } from '../../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })

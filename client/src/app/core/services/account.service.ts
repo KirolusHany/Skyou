@@ -6,53 +6,55 @@ import { SignalrService } from './signalr.service';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AccountService {
-baseUrl=environment.apiUrl;
-private httpclient = inject(HttpClient);
+  baseUrl = environment.apiUrl;
+  private httpclient = inject(HttpClient);
   private signalrService = inject(SignalrService);
-currentUser = signal<User|null>(null);
+  currentUser = signal<User | null>(null);
 
-login(values: any) {
-  let params = new HttpParams();
-  params = params.append('useCookies', true);
-  return this.httpclient.post<User>(this.baseUrl + 'login', values, {params}).pipe(
-    tap(() => this.signalrService.createHubConnection())
-  )
-}
+  login(values: any) {
+    let params = new HttpParams();
+    params = params.append('useCookies', true);
+    return this.httpclient
+      .post<User>(this.baseUrl + 'login', values, { params })
+      .pipe(tap(() => this.signalrService.createHubConnection()));
+  }
 
-register(values: any) {
-  return this.httpclient.post(this.baseUrl + 'account/register', values);
-}
+  register(values: any) {
+    return this.httpclient.post(this.baseUrl + 'account/register', values);
+  }
 
-getUserInfo() {
-  return this.httpclient.get<User>(this.baseUrl + 'account/user-info').pipe(
-    map(user => {
-      this.currentUser.set(user);
-      return user;
-    })
-  )
-}
-
-logout() {
-  return this.httpclient.post(this.baseUrl + 'account/logout', {}).pipe(
-    tap(() => this.signalrService.stopHubConnection())
-  )
-}
-
-updateAddress(address: Address) {
-  return this.httpclient.post(this.baseUrl + 'account/address', address).pipe(
-    tap(() => {
-      this.currentUser.update(user => {
-        if (user) user.address = address;
+  getUserInfo() {
+    return this.httpclient.get<User>(this.baseUrl + 'account/user-info').pipe(
+      map((user) => {
+        this.currentUser.set(user);
         return user;
       })
-    })
-  )
-}
+    );
+  }
 
-getAuthState() {
-  return this.httpclient.get<{isAuthenticated: boolean}>(this.baseUrl + 'account/auth-status');
-}
+  logout() {
+    return this.httpclient
+      .post(this.baseUrl + 'account/logout', {})
+      .pipe(tap(() => this.signalrService.stopHubConnection()));
+  }
+
+  updateAddress(address: Address) {
+    return this.httpclient.post(this.baseUrl + 'account/address', address).pipe(
+      tap(() => {
+        this.currentUser.update((user) => {
+          if (user) user.address = address;
+          return user;
+        });
+      })
+    );
+  }
+
+  getAuthState() {
+    return this.httpclient.get<{ isAuthenticated: boolean }>(
+      this.baseUrl + 'account/auth-status'
+    );
+  }
 }

@@ -5,9 +5,9 @@ using KikoStore.Api.Extentions;
 
 namespace KikoStore.Api.Extentions;
 
-public static class OrderMappingExtention
+public static class OrderMappingExtensions
 {
-  public static OrderDto ToDto(this Order order)
+    public static OrderDto ToDto(this Order order)
     {
         return new OrderDto
         {
@@ -20,7 +20,6 @@ public static class OrderMappingExtention
             ShippingPrice = order.DeliveryMethod.Price,
             OrderItems = order.OrderItems.Select(x => x.ToDto()).ToList(),
             Subtotal = order.Subtotal,
-            Discount = order.Discount,
             Total = order.GetTotal(),  
             Status = order.Status.ToString(),
             PaymentIntentId = order.PaymentIntentId

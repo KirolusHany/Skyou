@@ -1,6 +1,7 @@
 using System;
 using KikoStore.Core.Entities;
 using KikoStore.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace KikoStore.Infrastructure.Data;
 
@@ -28,6 +29,9 @@ public class SpecificationEvaluator<T> where T : BaseEntity
      if(specification.IsPagingEnabled){
             query = query.Skip(specification.Skip).Take(specification.Take);
         }
+        query = specification.Includes.Aggregate(query , (current,include) => current.Include(include));
+        query = specification.IncludeStrings.Aggregate(query , (current,include) => current.Include(include));
+
         return query;
     }
 

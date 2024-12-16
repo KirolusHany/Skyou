@@ -4,7 +4,7 @@ using KikoStore.Core.Entities;
 
 namespace KikoStore.Core.Interfaces;
 
-public interface ICartServices
+public interface ICartService
 {
     Task<ShoppingCart?> GetCartAsync(string key);
     Task<ShoppingCart?> SetCartAsync(ShoppingCart cart);

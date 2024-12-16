@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KikoStore.Infrastructure.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    [Migration("20241125162112_DeliveryMethodsTable")]
-    partial class DeliveryMethodsTable
+    [Migration("20241215144627_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,7 +33,7 @@ namespace KikoStore.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AdressId")
+                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -88,7 +88,7 @@ namespace KikoStore.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdressId");
+                    b.HasIndex("AddressId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -163,6 +163,66 @@ namespace KikoStore.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Adresses");
+                });
+
+            modelBuilder.Entity("KikoStore.Core.Entities.OrderAggregate.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BuyerEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DeliveryMethodId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentIntentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeliveryMethodId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("KikoStore.Core.Entities.OrderAggregate.OrderItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("KikoStore.Core.Entities.Product", b =>
@@ -339,11 +399,129 @@ namespace KikoStore.Infrastructure.Migrations
 
             modelBuilder.Entity("Company.ClassLibrary1.AppUser", b =>
                 {
-                    b.HasOne("KikoStore.Core.Entities.Address", "Adress")
+                    b.HasOne("KikoStore.Core.Entities.Address", "Address")
                         .WithMany()
-                        .HasForeignKey("AdressId");
+                        .HasForeignKey("AddressId");
 
-                    b.Navigation("Adress");
+                    b.Navigation("Address");
+                });
+
+            modelBuilder.Entity("KikoStore.Core.Entities.OrderAggregate.Order", b =>
+                {
+                    b.HasOne("Company.ClassLibrary1.DeliveryMethod", "DeliveryMethod")
+                        .WithMany()
+                        .HasForeignKey("DeliveryMethodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("KikoStore.Core.Entities.OrderAggregate.PaymentSummary", "PaymentSummary", b1 =>
+                        {
+                            b1.Property<int>("OrderId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Brand")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("ExpMonth")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("ExpYear")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Last4")
+                                .HasColumnType("int");
+
+                            b1.HasKey("OrderId");
+
+                            b1.ToTable("Orders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderId");
+                        });
+
+                    b.OwnsOne("KikoStore.Core.Entities.OrderAggregate.ShippingAddress", "ShippingAddress", b1 =>
+                        {
+                            b1.Property<int>("OrderId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Line1")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Line2")
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("PostalCode")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<string>("State")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("OrderId");
+
+                            b1.ToTable("Orders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderId");
+                        });
+
+                    b.Navigation("DeliveryMethod");
+
+                    b.Navigation("PaymentSummary")
+                        .IsRequired();
+
+                    b.Navigation("ShippingAddress")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("KikoStore.Core.Entities.OrderAggregate.OrderItem", b =>
+                {
+                    b.HasOne("KikoStore.Core.Entities.OrderAggregate.Order", null)
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.OwnsOne("KikoStore.Core.Entities.OrderAggregate.ProductItemOrdered", "ItemOrdered", b1 =>
+                        {
+                            b1.Property<int>("OrderItemId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("PictureUrl")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<int>("ProductId")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("ProductName")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("OrderItemId");
+
+                            b1.ToTable("OrderItems");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderItemId");
+                        });
+
+                    b.Navigation("ItemOrdered")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -395,6 +573,11 @@ namespace KikoStore.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("KikoStore.Core.Entities.OrderAggregate.Order", b =>
+                {
+                    b.Navigation("OrderItems");
                 });
 #pragma warning restore 612, 618
         }

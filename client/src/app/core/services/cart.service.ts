@@ -6,6 +6,7 @@ import { firstValueFrom, map, tap } from 'rxjs';
 import { DeliveryMethod } from '../../shared/models/deliveryMethod';
 import { environment } from '../../../environments/environment';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -23,24 +24,16 @@ export class CartService {
 
     if (!cart) return null;
     const subtotal = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    
-    let discountValue = 0;
+ 
 
-    if (cart.coupon) {
-      if (cart.coupon.amountOff) {
-        discountValue = cart.coupon.amountOff;
-      } else if (cart.coupon.percentOff) {
-        discountValue = subtotal * (cart.coupon.percentOff / 100);
-      }
-    }
+   
     
     const shipping = delivery ? delivery.price : 0;
 
     return {
       subtotal,
       shipping,
-      discount: discountValue,
-      total: subtotal + shipping - discountValue
+      total: subtotal + shipping 
     }
   })
 
@@ -60,10 +53,6 @@ export class CartService {
       })
     )
   }
-
-  // applyDiscount(code: string) {
-  //   return this.http.get<Coupon>(this.baseUrl + 'coupons/' + code);
-  // }
 
   async addItemToCart(item: CartItem | Product, quantity = 1) {
     const cart = this.cart() ?? this.createCart();

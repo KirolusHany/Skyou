@@ -5,7 +5,8 @@ import { firstValueFrom, map } from 'rxjs';
 import { Cart } from '../../shared/models/cart';
 import { AccountService } from './account.service';
 import { CartService } from './cart.service';
-import {ConfirmationToken, loadStripe, Stripe, StripeAddressElement, StripeAddressElementOptions, StripeElements, StripePaymentElement} from '@stripe/stripe-js';
+import {ConfirmationToken, Stripe, StripeAddressElement, StripeAddressElementOptions, StripeElements, StripePaymentElement} from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 @Injectable({
   providedIn: 'root'
@@ -135,7 +136,6 @@ export class StripeService {
       })
     )
   }
-
   disposeElements() {
     this.elements = undefined;
     this.addressElement = undefined;

@@ -22,9 +22,9 @@ public class BaseSpecification<T>(Expression<Func<T, bool>>? criteria) : ISpecif
 
     public bool IsPagingEnabled { get; private set; }
 
-    public List<Expression<Func<T, object>>> Includes {get; } = [];
+    public List<Expression<Func<T, object>>> Includes {get; } =[];
 
-    public List<string> IncludeStrings {get; } = [];
+    public List<string> IncludeStrings {get; } =[];
 
     public IQueryable<T> ApplyCriteria(IQueryable<T> query)
     {
@@ -36,9 +36,9 @@ public class BaseSpecification<T>(Expression<Func<T, bool>>? criteria) : ISpecif
         return query;
     }
 
-    protected void AddInclude(Expression<Func<T, object>> includeExpressions)
+    protected void AddInclude(Expression<Func<T, object>> includeExpression)
     {
-        Includes.Add(includeExpressions);
+        Includes.Add(includeExpression);
     }
 
     protected void AddInclude(string includeString)

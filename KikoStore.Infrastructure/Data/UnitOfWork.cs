@@ -6,7 +6,7 @@ using KikoStore.Core.Interfaces;
 
 namespace KikoStore.Infrastructure.Data;
 
-public class UnitOfWork(StoreContext context)  : IUnitOfWork
+public class UnitOfWork(StoreContext context) : IUnitOfWork
 {
     private readonly ConcurrentDictionary<string, object> _repositories = new();
 

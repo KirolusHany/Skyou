@@ -15,23 +15,15 @@ public class GenericRepository<T>(StoreContext context) : IGenericRepository<T> 
     public async Task<int> CountAsync(ISpecification<T> spec)
     {
         var query = context.Set<T>().AsQueryable();
-        query= spec.ApplyCriteria(query);
+
+        query = spec.ApplyCriteria(query);
+
         return await query.CountAsync();
-            }
-
-    public void Delete(T entity)
-    {
-        context.Set<T>().Remove(entity);
     }
 
-    public async Task<IReadOnlyList<T>> GetAllAsync()
+    public bool Exists(int id)
     {
-        return await context.Set<T>().ToListAsync();
-    }
-
-    public async Task<IReadOnlyList<T>> GetAsync(ISpecification<T> spec)
-    {
-        return await ApplySpecification(spec).ToListAsync();
+        return context.Set<T>().Any(x => x.Id == id);
     }
 
     public async Task<T?> GetByIdAsync(int id)
@@ -49,9 +41,14 @@ public class GenericRepository<T>(StoreContext context) : IGenericRepository<T> 
         return await ApplySpecification(spec).FirstOrDefaultAsync();
     }
 
-    public bool IsExsits(int id)
+    public async Task<IReadOnlyList<T>> ListAllAsync()
     {
-        return context.Set<T>().Any(x => x.Id == id);
+        return await context.Set<T>().ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec)
+    {
+        return await ApplySpecification(spec).ToListAsync();
     }
 
     public async Task<IReadOnlyList<TResult>> ListAsync<TResult>(ISpecification<T, TResult> spec)
@@ -59,8 +56,10 @@ public class GenericRepository<T>(StoreContext context) : IGenericRepository<T> 
         return await ApplySpecification(spec).ToListAsync();
     }
 
-  
-
+    public void Remove(T entity)
+    {
+        context.Set<T>().Remove(entity);
+    }
 
     public void Update(T entity)
     {
@@ -72,8 +71,9 @@ public class GenericRepository<T>(StoreContext context) : IGenericRepository<T> 
     {
         return SpecificationEvaluator<T>.GetQuery(context.Set<T>().AsQueryable(), spec);
     }
-    private IQueryable<TResult> ApplySpecification<TResult>(ISpecification<T,TResult> spec)
+
+    private IQueryable<TResult> ApplySpecification<TResult>(ISpecification<T, TResult> spec)
     {
-        return SpecificationEvaluator<T>.GetQuery<T,TResult>(context.Set<T>().AsQueryable(), spec);
+        return SpecificationEvaluator<T>.GetQuery<T, TResult>(context.Set<T>().AsQueryable(), spec);
     }
 }

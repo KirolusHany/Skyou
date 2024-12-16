@@ -1,11 +1,11 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using KikoStore.Core.Entities.OrderAggregate;
 
 namespace KikoStore.Api.DTOs;
-
 public class CreateProductDto
 {
-     [Required]
+    [Required]
     public string Name { get; set; } = string.Empty;
 
     [Required]

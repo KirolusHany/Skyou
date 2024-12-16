@@ -51,7 +51,7 @@ namespace KikoStore.Api.Controllers
         }
         public bool ProductExists(int id)
         {
-            return unitOfWork.Repository<Product>().IsExsits(id);
+            return unitOfWork.Repository<Product>().Exists(id);
         }
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateProduct(int id, Product product)
@@ -71,7 +71,7 @@ namespace KikoStore.Api.Controllers
         {
             var productFromDb = await unitOfWork.Repository<Product>().GetByIdAsync(id);
             if (productFromDb == null) return NotFound("can not Deleted product");
-            unitOfWork.Repository<Product>().Delete(productFromDb);
+            unitOfWork.Repository<Product>().Remove(productFromDb);
             if (await unitOfWork.Complete())
             {
                 return NoContent();

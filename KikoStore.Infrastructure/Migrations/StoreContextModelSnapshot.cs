@@ -30,7 +30,7 @@ namespace KikoStore.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<int?>("AdressId")
+                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -85,7 +85,7 @@ namespace KikoStore.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AdressId");
+                    b.HasIndex("AddressId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -176,9 +176,6 @@ namespace KikoStore.Infrastructure.Migrations
 
                     b.Property<int>("DeliveryMethodId")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
@@ -399,11 +396,11 @@ namespace KikoStore.Infrastructure.Migrations
 
             modelBuilder.Entity("Company.ClassLibrary1.AppUser", b =>
                 {
-                    b.HasOne("KikoStore.Core.Entities.Address", "Adress")
+                    b.HasOne("KikoStore.Core.Entities.Address", "Address")
                         .WithMany()
-                        .HasForeignKey("AdressId");
+                        .HasForeignKey("AddressId");
 
-                    b.Navigation("Adress");
+                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("KikoStore.Core.Entities.OrderAggregate.Order", b =>

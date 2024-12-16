@@ -3,19 +3,19 @@ using KikoStore.Core.Entities.OrderAggregate;
 
 namespace KikoStore.Core.Specification;
 
-public class OrderSpecification :BaseSpecification<Order>
+public class OrderSpecification : BaseSpecification<Order>
 {
-     public OrderSpecification(string email) : base(x => x.BuyerEmail == email)
+    public OrderSpecification(string email) : base(x => x.BuyerEmail == email)
     {
         AddInclude(x => x.OrderItems);
         AddInclude(x => x.DeliveryMethod);
-        AddOrderByDescending(x => x.OrderDate);
+        AddOrderBy(x => x.OrderDate);
     }
 
     public OrderSpecification(string email, int id) : base(x => x.BuyerEmail == email && x.Id == id)
     {
         AddInclude("OrderItems");
-        AddInclude("DeliveryMethod");
+        AddInclude("DeliveryMethods");
     }
 
     public OrderSpecification(string paymentIntentId, bool isPaymentIntent): 
@@ -46,5 +46,4 @@ public class OrderSpecification :BaseSpecification<Order>
     //     if (Enum.TryParse<OrderStatus>(status, true, out var result)) return result;
     //     return null;
     // }
-
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace KikoStore.Api.Controllers;
 
- public class CartController(ICartServices cartService) : BaseApiController
+public class CartController(ICartService cartService) : BaseApiController
 {
     [HttpGet]
     public async Task<ActionResult<ShoppingCart>> GetCartById(string id)

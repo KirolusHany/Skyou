@@ -1,10 +1,9 @@
 using System;
 
 namespace KikoStore.Api.DTOs;
-
 public class OrderItemDto
 {
- public int ProductId { get; set; }
+    public int ProductId { get; set; }
     public required string ProductName { get; set; }
     public required string PictureUrl { get; set; }
     public decimal Price { get; set; }

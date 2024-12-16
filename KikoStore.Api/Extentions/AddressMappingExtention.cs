@@ -4,13 +4,13 @@ using KikoStore.Core.Entities;
 
 namespace KikoStore.Api.Extentions;
 
-public static class AddressMappingExtention
+public static class AddressMappingExtensions
 {
-     public static AdressDto? ToDto(this Address? address)
+    public static AddressDto? ToDto(this Address? address)
     {
         if (address == null) return null;
 
-        return new AdressDto
+        return new AddressDto
         {
             Line1 = address.Line1,
             Line2 = address.Line2,
@@ -21,7 +21,7 @@ public static class AddressMappingExtention
         };
     }
 
-    public static Address ToEntity(this AdressDto addressDto)
+    public static Address ToEntity(this AddressDto addressDto)
     {
         if (addressDto == null) throw new ArgumentNullException(nameof(addressDto));
 
@@ -36,7 +36,7 @@ public static class AddressMappingExtention
         };
     }
 
-    public static void UpdateFromDto(this Address address, AdressDto addressDto)
+    public static void UpdateFromDto(this Address address, AddressDto addressDto)
     {
         if (addressDto == null) throw new ArgumentNullException(nameof(addressDto));
         if (address == null) throw new ArgumentNullException(nameof(address));

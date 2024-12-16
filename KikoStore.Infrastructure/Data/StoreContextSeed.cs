@@ -3,48 +3,55 @@ using System.Reflection;
 using System.Text.Json;
 using Company.ClassLibrary1;
 using KikoStore.Core.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace KikoStore.Infrastructure.Data;
 
 public class StoreContextSeed
 {
-    public static async Task SeedAsync(StoreContext context)
+    public static async Task SeedAsync(StoreContext context, UserManager<AppUser> userManager)
     {
+        if (!userManager.Users.Any(x => x.UserName == "admin@test.com"))
+        {
+            var user = new AppUser
+            {
+                UserName = "admin@test.com",
+                Email = "admin@test.com",
+            };
+
+            await userManager.CreateAsync(user, "Pa$$w0rd");
+            await userManager.AddToRoleAsync(user, "Admin");
+        }
+
         var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
         if (!context.Products.Any())
         {
-            var productsData = await File.ReadAllTextAsync
-            (path + @"/Data/SeedData/products.json");
+            var productsData = await File
+                .ReadAllTextAsync(path + @"/Data/SeedData/products.json");
 
-            var products = JsonSerializer
-            .Deserialize<List<Product>>(productsData);
+            var products = JsonSerializer.Deserialize<List<Product>>(productsData);
 
-            if (products == null)
-            {
-                return;
-            }
+            if (products == null) return;
 
-            await context.Products.AddRangeAsync(products);
+            context.Products.AddRange(products);
+
             await context.SaveChangesAsync();
-
         }
+
         if (!context.DeliveryMethods.Any())
         {
-            var deliveryMethodData = await File.ReadAllTextAsync
-            (path + @"/Data/SeedData/delivery.json");
+            var dmData = await File
+                .ReadAllTextAsync(path + @"/Data/SeedData/delivery.json");
 
-            var methods = JsonSerializer
-            .Deserialize<List<DeliveryMethod>>(deliveryMethodData);
+            var methods = JsonSerializer.Deserialize<List<DeliveryMethod>>(dmData);
 
-            if (methods == null)
-            {
-                return;
-            }
+            if (methods == null) return;
 
-            await context.DeliveryMethods.AddRangeAsync(methods);
+            context.DeliveryMethods.AddRange(methods);
+
             await context.SaveChangesAsync();
-
         }
-
     }
+
 }
