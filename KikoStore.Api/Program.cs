@@ -66,7 +66,7 @@ try
     var context = services.GetRequiredService<StoreContext>();
     var userManager = services.GetRequiredService<UserManager<AppUser>>();
     await context.Database.MigrateAsync();
-    await StoreContextSeed.SeedAsync(context, userManager);
+    await StoreContextSeed.SeedAsync(context);
 }
 catch (Exception ex)
 {
