@@ -35,4 +35,4 @@ public class NotificationHub : Hub
 
         return connectionId;
     }
-}   
+}

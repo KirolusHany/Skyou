@@ -11,6 +11,8 @@ import { loadStripe } from '@stripe/stripe-js';
 @Injectable({
   providedIn: 'root'
 })
+
+
 export class StripeService {
   baseUrl = environment.apiUrl;
   private cartService = inject(CartService);
@@ -136,6 +138,7 @@ export class StripeService {
       })
     )
   }
+
   disposeElements() {
     this.elements = undefined;
     this.addressElement = undefined;
