@@ -4,6 +4,7 @@ using KikoStore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KikoStore.Infrastructure.Migrations
 {
     [DbContext(typeof(StoreContext))]
-    partial class StoreContextModelSnapshot : ModelSnapshot
+    [Migration("20241217154247_RoleAdded")]
+    partial class RoleAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,7 +126,7 @@ namespace KikoStore.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DeliveryMethods", (string)null);
+                    b.ToTable("DeliveryMethods");
                 });
 
             modelBuilder.Entity("KikoStore.Core.Entities.Address", b =>
@@ -159,7 +162,7 @@ namespace KikoStore.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Adresses", (string)null);
+                    b.ToTable("Adresses");
                 });
 
             modelBuilder.Entity("KikoStore.Core.Entities.OrderAggregate.Order", b =>
@@ -195,7 +198,7 @@ namespace KikoStore.Infrastructure.Migrations
 
                     b.HasIndex("DeliveryMethodId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("KikoStore.Core.Entities.OrderAggregate.OrderItem", b =>
@@ -219,7 +222,7 @@ namespace KikoStore.Infrastructure.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItems", (string)null);
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("KikoStore.Core.Entities.Product", b =>
@@ -258,7 +261,7 @@ namespace KikoStore.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -425,7 +428,7 @@ namespace KikoStore.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("KikoStore.Core.Entities.OrderAggregate.Order.PaymentSummary#KikoStore.Core.Entities.OrderAggregate.PaymentSummary", "PaymentSummary", b1 =>
+                    b.OwnsOne("KikoStore.Core.Entities.OrderAggregate.PaymentSummary", "PaymentSummary", b1 =>
                         {
                             b1.Property<int>("OrderId")
                                 .HasColumnType("int");
@@ -445,13 +448,13 @@ namespace KikoStore.Infrastructure.Migrations
 
                             b1.HasKey("OrderId");
 
-                            b1.ToTable("Orders", (string)null);
+                            b1.ToTable("Orders");
 
                             b1.WithOwner()
                                 .HasForeignKey("OrderId");
                         });
 
-                    b.OwnsOne("KikoStore.Core.Entities.OrderAggregate.Order.ShippingAddress#KikoStore.Core.Entities.OrderAggregate.ShippingAddress", "ShippingAddress", b1 =>
+                    b.OwnsOne("KikoStore.Core.Entities.OrderAggregate.ShippingAddress", "ShippingAddress", b1 =>
                         {
                             b1.Property<int>("OrderId")
                                 .HasColumnType("int");
@@ -485,7 +488,7 @@ namespace KikoStore.Infrastructure.Migrations
 
                             b1.HasKey("OrderId");
 
-                            b1.ToTable("Orders", (string)null);
+                            b1.ToTable("Orders");
 
                             b1.WithOwner()
                                 .HasForeignKey("OrderId");
@@ -507,7 +510,7 @@ namespace KikoStore.Infrastructure.Migrations
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.OwnsOne("KikoStore.Core.Entities.OrderAggregate.OrderItem.ItemOrdered#KikoStore.Core.Entities.OrderAggregate.ProductItemOrdered", "ItemOrdered", b1 =>
+                    b.OwnsOne("KikoStore.Core.Entities.OrderAggregate.ProductItemOrdered", "ItemOrdered", b1 =>
                         {
                             b1.Property<int>("OrderItemId")
                                 .HasColumnType("int");
@@ -525,7 +528,7 @@ namespace KikoStore.Infrastructure.Migrations
 
                             b1.HasKey("OrderItemId");
 
-                            b1.ToTable("OrderItems", (string)null);
+                            b1.ToTable("OrderItems");
 
                             b1.WithOwner()
                                 .HasForeignKey("OrderItemId");

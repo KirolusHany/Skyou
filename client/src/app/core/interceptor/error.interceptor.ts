@@ -34,7 +34,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
       if (err.status === 500) {
         const navigationExtras: NavigationExtras = {state: {error: err.error}}
-        router.navigateByUrl('/server-error',navigationExtras);
+        router.navigateByUrl('/server-error', navigationExtras);
       }
       return throwError(() => err)
     })

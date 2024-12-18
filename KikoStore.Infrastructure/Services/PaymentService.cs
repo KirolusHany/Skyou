@@ -7,92 +7,57 @@ using Stripe;
 
 namespace KikoStore.Infrastructure.Services;
 
-public class PaymentService(IConfiguration config, ICartService cartService, IUnitOfWork
-unit) : IPaymentService
-{
 
+public class PaymentService : IPaymentService
+{
+    private readonly ICartService cartService;
+    private readonly IUnitOfWork unit;
+
+    public PaymentService(IConfiguration config, ICartService cartService,
+        IUnitOfWork unit)
+    {
+        this.cartService = cartService;
+        this.unit = unit;
+        StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
+    }
 
     public async Task<ShoppingCart?> CreateOrUpdatePaymentIntent(string cartId)
     {
-        // var cart = await cartService.GetCartAsync(cartId)
-        //     ?? throw new Exception("Cart unavailable");
+        var cart = await cartService.GetCartAsync(cartId)
+            ?? throw new Exception("Cart unavailable");
 
-        // var shippingPrice = await GetShippingPriceAsync(cart) ?? 0;
+        var shippingPrice = await GetShippingPriceAsync(cart) ?? 0;
 
-        // await ValidateCartItemsInCartAsync(cart);
+        await ValidateCartItemsInCartAsync(cart);
 
-        // var subtotal = CalculateSubtotal(cart);
+        var subtotal = CalculateSubtotal(cart);
 
-        // var total = subtotal + shippingPrice;
+        // if (cart.Coupon != null)
+        // {
+        //     subtotal = await ApplyDiscountAsync(cart.Coupon, subtotal);
+        // }
 
-        // await CreateUpdatePaymentIntentAsync(cart, total);
+        var total = subtotal + shippingPrice;
 
-        // await cartService.SetCartAsync(cart);
+        await CreateUpdatePaymentIntentAsync(cart, total);
 
-        // return cart;
-        StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
-        var cart = await cartService.GetCartAsync(cartId);
-        if (cart == null) return null;
-
-        var shippingPrice = 0m;
-        if (cart.DeliveryMethodId.HasValue)
-        {
-            var deliveryMethod = await unit.Repository<DeliveryMethod>().GetByIdAsync((int)cart.DeliveryMethodId);
-            if (deliveryMethod == null) return null;
-            shippingPrice = deliveryMethod.Price;
-        }
-
-        foreach (var item in cart.Items)
-        {
-            var productItem = await unit.Repository<Core.Entities.Product>().GetByIdAsync(item.ProductId);
-            if (productItem == null) return null;
-            if (item.Price != productItem.Price)
-            {
-                item.Price = productItem.Price;
-            }
-        }
-
-        var service = new PaymentIntentService();
-        PaymentIntent? intent = null;
-
-        if (string.IsNullOrEmpty(cart.PaymentIntentId))
-        {
-            var options = new PaymentIntentCreateOptions
-            {
-                Amount = (long)cart.Items.Sum(x => x.Quantity * (x.Price * 100))
-                + (long)shippingPrice * 100,
-                Currency = "usd",
-                PaymentMethodTypes = ["card"]
-            };
-            intent = await service.CreateAsync(options);
-            cart.PaymentIntentId = intent.Id;
-            cart.ClientSecret = intent.ClientSecret;
-        }
-        else
-        {
-            var options = new PaymentIntentUpdateOptions
-            {
-                Amount = (long)cart.Items.Sum(x => x.Quantity * (x.Price * 100))
-                + (long)shippingPrice * 100,
-            };
-            intent = await service.UpdateAsync(cart.PaymentIntentId,options);
-        }
         await cartService.SetCartAsync(cart);
+
         return cart;
     }
 
-    // public async Task<string> RefundPayment(string paymentIntentId)
-    // {
-    //     var refundOptions = new RefundCreateOptions
-    //     {
-    //         PaymentIntent = paymentIntentId
-    //     };
+    public async Task<string> RefundPayment(string paymentIntentId)
+    {
+        var refundOptions = new RefundCreateOptions
+        {
+            PaymentIntent = paymentIntentId
+        };
 
-    //     var refundService = new RefundService();
-    //     var result = await refundService.CreateAsync(refundOptions);
+        var refundService = new RefundService();
+        var result = await refundService.CreateAsync(refundOptions);
 
-    //     return result.Status;
-    // }
+        return result.Status;
+    }
 
     private async Task CreateUpdatePaymentIntentAsync(ShoppingCart cart, long total)
     {

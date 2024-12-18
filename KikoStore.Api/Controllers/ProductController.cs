@@ -2,8 +2,10 @@ using Company.ClassLibrary1;
 using KikoStore.Core.Entities;
 using KikoStore.Core.Interfaces;
 using KikoStore.Core.Specification;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
 
 namespace KikoStore.Api.Controllers
 {
@@ -14,7 +16,7 @@ namespace KikoStore.Api.Controllers
         ([FromQuery] ProductSpecificationsParams specParams)
         {
             var spec = new ProductSpecification(specParams);
-            return await CreatePagedSize(unitOfWork.Repository<Product>(),spec,specParams.PageIndex,specParams.PageSize);
+            return await CreatePagedResult(unitOfWork.Repository<Product>(), spec, specParams.PageIndex, specParams.PageSize);
         }
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetBrandsAsync()
@@ -38,7 +40,7 @@ namespace KikoStore.Api.Controllers
             return product;
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
@@ -53,6 +55,7 @@ namespace KikoStore.Api.Controllers
         {
             return unitOfWork.Repository<Product>().Exists(id);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateProduct(int id, Product product)
         {
@@ -65,6 +68,7 @@ namespace KikoStore.Api.Controllers
             return BadRequest("prblem in product updating");
 
         }
+        [Authorize(Roles = "Admin")]
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteProduct(int id)
